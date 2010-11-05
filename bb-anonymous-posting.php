@@ -19,7 +19,7 @@ add_action('bb_init', 'bb_anon_init');
 // add a location for the bb-post page
 add_filter('bb_get_location', 'bb_anon_get_bb_post', 10, 2);
 function bb_anon_get_bb_post($loc = '', $file = '') {
-	if (bb_find_filename($file) == 'bb-post.php')
+	if (bb_find_filename('/' . $file) == 'bb-post.php')
 		return 'bb-post';
 }
 
@@ -35,7 +35,7 @@ function bb_anon_init() {
 	if (bb_get_option('bb_anon_write_topics') == 'Y')
 		$perm_array['write_topics'] = true;
 	
-	$bb_roles->add_role('anonymous', $perm_array, 'Anonymous');
+	$bb_roles->add_role('anonymous', 'Anonymous', $perm_array);
 	if ('bb-post' == bb_get_location())
 		bb_anon_spoof_user();
 }
@@ -55,7 +55,7 @@ function bb_anon_spoof_user() {
 			bb_anon_activate_plugin();
 			$anon_id = bb_get_option('bb_anon_user_id');
 		}
-		$bb_current_user = new BB_User($anon_id);
+		$bb_current_user = new BP_User($anon_id);
 	}
 }
 
@@ -93,7 +93,7 @@ function bb_anon_activate_plugin() {
 		bb_update_option('bb_anon_user_id', $anon_id);
 	}
 
-	$user = new BB_User($anon_id);
+	$user = new BP_User($anon_id);
 
 	$user->add_role('anonymous');
 	$user->remove_role('member');
@@ -175,7 +175,7 @@ add_action('bb_anon_settings_page_pre_head','bb_anon_settings_page_process');
 function bb_anon_settings_page_process() {
 	if(isset($_POST['bb_anon_submit_options'])) {
 		$anon_id = bb_get_option('bb_anon_user_id');
-		$user = new BB_User($anon_id);
+		$user = new BP_User($anon_id);
 
 		if($_POST['bb_anon_write_topics'] == Y) {
 			bb_update_option('bb_anon_write_topics',"Y"); 
